@@ -44,7 +44,7 @@ density_map <- hcmap(map = "countries/us/us-wa-all",
             align = "right",
             valueDecimals = 0) %>% 
   hc_colorAxis(dataClasses = color_classes(breaks = c(0,10,25,50,100,250,500,1000,2500,max(density_df$density)),
-              colors = brewer.pal(name="YlOrRd",n=9)))
+              colors = brewer.pal(name="Purples",n=9)))
 
 ```
 
@@ -103,17 +103,31 @@ animated_map <- hcmap(map = "countries/us/us-wa-all",
    hc_colorAxis(dataClasses = color_classes(breaks = c(0,10,25,50,100,250,500,1000,2500,max(density_df_by_year$density)),
               colors = brewer.pal(name="Purples",n=9))) %>%
   hc_legend(layout = "vertical", 
-            align = "right",
-            valueDecimals = 0) %>% 
-    hc_tooltip(formatter = JS("function() {
-  return ('<br><b>County:</b> ' + this.point.County +
-          '<br><b>Population Density:</b> ' + this.point.density + ' people per sq mi'
-  )}")) %>%
+            align = "right") %>% 
   hc_title(text = "Population Density by County, 2010 to 2018") %>%
   hc_credits(enabled = TRUE,
-             text = "Author: eScience Institute, Data: USDA ERS",
+             text = "Author: James Lamar Foster, Data: USDA ERS",
              href = "https://www.ers.usda.gov/data-products/atlas-of-rural-and-small-town-america/download-the-data/")  
 ```
+
+
+```{r}
+animated_map <- hcmap(map = "countries/us/us-wa-all", 
+      data = density_df_by_year, 
+      value = "density", 
+      joinBy = c("fips"),
+      borderWidth = 0.3)  %>%
+  hc_mapNavigation(enabled = TRUE) %>% 
+   hc_colorAxis(dataClasses = color_classes(breaks = c(0,10,25,50,100,250,500,1000,2500,max(density_df_by_year$density)),
+              colors = brewer.pal(name="Purples",n=9))) %>%
+  hc_legend(layout = "vertical", 
+            align = "right") %>% 
+  hc_title(text = "") %>%
+  hc_credits(enabled = TRUE,
+             text = "Author: James Lamar Foster, Data: USDA ERS",
+             href = "https://www.ers.usda.gov/data-products/atlas-of-rural-and-small-town-america/download-the-data/")  
+```
+
 
 ```{r}
 # Add animation to map
@@ -128,6 +142,7 @@ animated_map %>%
           autoPlay = TRUE,
           loop = TRUE,
           labels = unique(density_df_by_year$year))
+
 ```
 
 
