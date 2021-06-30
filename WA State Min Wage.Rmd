@@ -1,0 +1,50 @@
+---
+title: "Another one...Map"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(gganimate)
+library(rvest)
+library(lubridate)
+```
+
+```{r}
+link <- "https://lni.wa.gov/workers-rights/wages/minimum-wage/history-of-washington-states-minimum-wage"
+page <- read_html(link)
+Date <-  page %>% html_nodes("td:nth-child(1)") %>% html_text()
+Wage <- page %>% html_nodes("td+ td") %>% html_text()
+#Turn into data frame 
+df_wage <- data.frame(Date, Wage)
+```
+
+```{r}
+glimpse(df_wage)
+
+#Quick Clean of data set 
+wa_wage <- df_wage %>% 
+  slice(-1) %>% 
+  mutate(Wage = parse_number(Wage)) %>% 
+  mutate(Date = mdy(Date)) %>% 
+  mutate(State = "WA")
+
+#Separate Date column
+wa_year <- wa_wage %>% 
+mutate(Date = as.numeric(format(wa_wage$Date, "%Y")))
+```
+
+
+```{r}
+#Visualize WA min wage df 
+
+ggplot(wa_year, aes(Date, Wage)) + 
+  geom_point(color = "#4b2e83") + scale_y_continuous(breaks = 0:15) + theme_bw() +  labs(title = 'Year: {frame_time}', x = '', y = 'Washington State Minimum Wage') +
+  transition_time(Date) +
+  ease_aes('linear')
+```
+
