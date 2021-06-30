@@ -12,6 +12,9 @@ library(tidyverse)
 library(gganimate)
 library(rvest)
 library(lubridate)
+library(gifski)
+library(ggrepel)
+library(scales)
 ```
 
 ```{r}
@@ -35,16 +38,23 @@ wa_wage <- df_wage %>%
 
 #Separate Date column
 wa_year <- wa_wage %>% 
-mutate(Date = as.numeric(format(wa_wage$Date, "%Y")))
+mutate(Date = as.integer(format(wa_wage$Date, "%Y")))
 ```
 
 
 ```{r}
 #Visualize WA min wage df 
+w <- ggplot(wa_year, aes(Date, Wage)) + 
+  geom_line(color = "#4b2e83") + 
+  geom_point(aes(group =seq_along(Date)), color = "#85754d") + 
+  scale_y_continuous(breaks = 0:15, labels= label_dollar()) + 
+  theme_bw() +  
+  labs(title = 'Washington State Minimum Wage', x = 'Year', y = 'Minimum Wage') +
+  transition_reveal(Date) 
 
-ggplot(wa_year, aes(Date, Wage)) + 
-  geom_point(color = "#4b2e83") + scale_y_continuous(breaks = 0:15) + theme_bw() +  labs(title = 'Year: {frame_time}', x = '', y = 'Washington State Minimum Wage') +
-  transition_time(Date) +
-  ease_aes('linear')
+animate(w, renderer = gifski_renderer())
+
+anim_save("wa_minwage.gif", w)
+
 ```
 
